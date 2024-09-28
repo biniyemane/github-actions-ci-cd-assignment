@@ -1,4 +1,4 @@
-name: CI Workflow
+name: CI/CD Workflow
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,9 +20,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
+        
       - name: Run tests
         run: npm test
         
       - name: Build artifacts
         run: npm run build
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku git:remote -a bini-heroku-app
+          git push heroku main
+
